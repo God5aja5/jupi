@@ -4,7 +4,8 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir jupyterlab
 
-EXPOSE 8080  # Render will map its own $PORT to this
+# Render will map its own $PORT to this
+EXPOSE 8080  
 
 # Shell form to expand $PORT from Render
 CMD jupyter lab --ip=0.0.0.0 --port=${PORT} --no-browser --allow-root
