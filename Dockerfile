@@ -1,11 +1,20 @@
-FROM python:3.8-slim
+FROM ubuntu:22.04
 
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies: python, tmate, curl, etc.
+RUN apt update && \
+    apt install -y python3 python3-pip curl wget git tmate && \
+    apt clean && rm -rf /var/lib/apt/lists/*
+
+# Create working directory and dummy index
 WORKDIR /app
+RUN echo "Tmate session is running on Render 🚀" > index.html
 
-RUN pip install --no-cache-dir jupyterlab notebook
+# Render requires a web service, so expose port 10000 (default Render)
+EXPOSE 10000
 
-EXPOSE 8080
-
-ENV JUPYTER_PASSWORD_HASH="sha1:3c9bbf2f0bbd:2d9ccfbcbfdbfbb64e4ea1b38f1a5a5953b91f15"
-
-CMD jupyter lab --ip=0.0.0.0 --port=${PORT} --no-browser --allow-root --NotebookApp.password=${JUPYTER_PASSWORD_HASH} --NotebookApp.token=''
+# Start Python web server and tmate
+CMD python3 -m http.server 10000 & \
+    tmate -F
